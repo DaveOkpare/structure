@@ -1,5 +1,11 @@
+import os
 import typer
 from rich import print
+from rich.progress import Progress, SpinnerColumn, TextColumn
+
+from utils import process_website
+
+cwd = os.getcwd()
 
 
 def main():
@@ -22,9 +28,27 @@ def main():
     print(f"Fields to organize data: [bold green]{fields_list}[/bold green]\n")
 
     save_path = typer.prompt(
-        "Where would you like to save the extracted data? (Please provide the file path):"
+        "Where would you like to save the extracted data? (Please provide the file path)",
+        default=cwd,
     )
-    typer.echo(f"Data will be saved to: [bold green]{save_path}[/bold green]")
+    print("\n")
+    file_name = "_".join(extraction_target.split(" ")) + ".json"
+    save_path = os.path.join(save_path, file_name)
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        progress.add_task(description="Processing...", total=None)
+        output = process_website(
+            url=website,
+            prompt=f"Extract {num_items} {extraction_target} from the context",
+            fields=fields_list,
+        )
+        with open(save_path, "w") as f:
+            f.write(output)
+        print(f"\nData saved to: [bold green]{save_path}[/bold green]")
 
 
 if __name__ == "__main__":
