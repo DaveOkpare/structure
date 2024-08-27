@@ -42,7 +42,7 @@ def extract(sys_msg: str, context: str, fields: list):
         data: List[datamodel]  # type: ignore
 
     extracted_data = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         response_model=MultiOutput,
         messages=[
             {"role": "system", "content": sys_msg},
